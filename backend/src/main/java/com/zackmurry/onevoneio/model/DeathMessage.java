@@ -9,10 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PositionMessage {
+public class DeathMessage {
 
     private String name;
-    private Position position;
-    private short rotation;
+    private String bulletId;
 
 }

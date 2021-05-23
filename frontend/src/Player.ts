@@ -1,7 +1,7 @@
+import { Client } from '@stomp/stompjs'
 import autoBind from 'auto-bind'
-
-const PLAYER_MOVE_SPEED = 0.005
-const PLAYER_RADIUS = 15
+import { v4 as generateUUID } from 'uuid'
+import { PLAYER_MOVE_SPEED, PLAYER_RADIUS, POSITION_UPDATE_TIME } from './constants'
 
 export default class Player {
   x = 0
@@ -12,14 +12,23 @@ export default class Player {
   rotation = 90 // In degrees (because the server stores it as a short), starting from the right and moving counter-clockwise
   mouseX = 0
   mouseY = 0
+  name: string
+  ws: Client
+  onShoot: (angle: number, bulletId: string) => void
+  isAlive = true
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, ws: Client) {
     autoBind(this)
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
+    this.ws = ws
+    this.name = `Zack ${Math.floor(Math.random() * 100)}`
+    this.onShoot = () => undefined
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
     window.addEventListener('mousemove', this.onMouseMove)
+    window.addEventListener('mousedown', this.onMouseDown)
+    this.sendPositionToServer()
   }
 
   update(delta: number): void {
@@ -38,13 +47,12 @@ export default class Player {
     } else if (this.keys.a) {
       this.x -= actualPlayerMoveSpeed
     }
-    this.rotation = -(Math.atan(this.mouseY / this.mouseX) * 180) / Math.PI
-    if ((this.mouseX < 0 && this.mouseY > 0) || (this.mouseX < 0 && this.mouseY < 0)) {
-      // console.log(`flipping rotation; x: ${this.mouseX > 0}; y: ${this.mouseY > 0}`)
-      this.rotation += 180
+    this.rotation = Math.round(-(Math.atan2(this.mouseY, this.mouseX) * 180) / Math.PI)
+    if (this.rotation < 0) {
+      this.rotation += 360
     }
-    console.log(`x: ${this.mouseX > 0}; y: ${this.mouseY > 0}`)
-    console.log(this.rotation)
+    // console.log(`x: ${this.mouseX > 0}; y: ${this.mouseY > 0}`)
+    // console.log(this.rotation)
   }
 
   render(): void {
@@ -57,7 +65,7 @@ export default class Player {
     this.context.translate(this.canvas.width / 2, this.canvas.height / 2)
     this.context.rotate((-this.rotation * Math.PI) / 180)
     this.context.fillStyle = 'black'
-    this.context.fillRect(0, -5, 25, 10)
+    this.context.fillRect(5, -5, 25, 10)
     this.context.restore()
   }
 
@@ -72,5 +80,53 @@ export default class Player {
   onMouseMove(e: MouseEvent): void {
     this.mouseX = e.pageX - this.canvas.width / 2
     this.mouseY = e.pageY - this.canvas.height / 2
+  }
+
+  onMouseDown(e: MouseEvent): void {
+    const targetOffsetX = e.pageX - this.canvas.width / 2
+    const targetOffsetY = e.pageY - this.canvas.height / 2
+    let angle = Math.round(-(Math.atan2(targetOffsetY, targetOffsetX) * 180) / Math.PI)
+    if (angle < 0) {
+      angle += 360
+    }
+    const id = generateUUID()
+    this.onShoot(angle, id)
+    this.sendShotToServer(angle, id)
+  }
+
+  sendPositionToServer(): void {
+    if (this.ws.connected && this.isAlive) {
+      this.ws.publish({
+        destination: '/app/position',
+        body: JSON.stringify({
+          name: this.name,
+          position: {
+            x: Math.round(this.x),
+            y: Math.round(this.y)
+          },
+          rotation: this.rotation
+        })
+      })
+    }
+    setTimeout(this.sendPositionToServer, POSITION_UPDATE_TIME)
+  }
+
+  sendShotToServer(angle: number, id: string): void {
+    if (this.ws.connected) {
+      console.log('Sending shot')
+      this.ws.publish({
+        destination: '/app/fire',
+        body: JSON.stringify({
+          name: this.name,
+          origin: {
+            x: Math.round(this.x),
+            y: Math.round(this.y)
+          },
+          angle,
+          time: new Date().getTime(),
+          id
+        })
+      })
+    }
   }
 }

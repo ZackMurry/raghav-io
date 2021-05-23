@@ -18,7 +18,7 @@ public class PositionController {
 
     @MessageMapping("/position")
     public void updatePosition(PositionMessage positionMessage) {
-        logger.info("Position of {}: ({}, {}); direction: ({}, {})", positionMessage.getName(), positionMessage.getPosition().getX(), positionMessage.getPosition().getY(), positionMessage.getDirection().getX(), positionMessage.getDirection().getY());
+//        logger.info("Position of {}: ({}, {}); rotation: {}", positionMessage.getName(), positionMessage.getPosition().getX(), positionMessage.getPosition().getY(), positionMessage.getRotation());
         simpMessagingTemplate.convertAndSend("/topic/positions", positionMessage);
     }
 

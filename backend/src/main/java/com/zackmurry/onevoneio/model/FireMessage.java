@@ -9,10 +9,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PositionMessage {
+public class FireMessage {
 
+    // todo use player ids instead of names
     private String name;
-    private Position position;
-    private short rotation;
+    private Position origin;
+    private short angle;
+    private long time;
+    private String id;
 
 }
