@@ -2,6 +2,7 @@ import { Client } from '@stomp/stompjs'
 import autoBind from 'auto-bind'
 import { v4 as generateUUID } from 'uuid'
 import { PLAYER_MOVE_SPEED, PLAYER_RADIUS, POSITION_UPDATE_TIME } from './constants'
+import DefaultMap from './map/DefaultMap'
 
 export default class Player {
   x = 0
@@ -16,12 +17,14 @@ export default class Player {
   ws: Client
   onShoot: (angle: number, bulletId: string) => void
   isAlive = true
+  map: DefaultMap
 
-  constructor(canvas: HTMLCanvasElement, ws: Client) {
+  constructor(canvas: HTMLCanvasElement, ws: Client, map: DefaultMap) {
     autoBind(this)
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
     this.ws = ws
+    this.map = map
     this.name = `Zack ${Math.floor(Math.random() * 100)}`
     this.onShoot = () => undefined
     window.addEventListener('keydown', this.onKeyDown)
@@ -36,20 +39,40 @@ export default class Player {
     if ((this.keys.w || this.keys.s) && (this.keys.a || this.keys.d)) {
       actualPlayerMoveSpeed /= Math.SQRT2
     }
+    let newY = this.y
     if (this.keys.w) {
-      this.y += actualPlayerMoveSpeed
+      newY += actualPlayerMoveSpeed
     } else if (this.keys.s) {
-      this.y -= actualPlayerMoveSpeed
+      newY -= actualPlayerMoveSpeed
     }
 
+    let newX = this.x
     if (this.keys.d) {
-      this.x += actualPlayerMoveSpeed
+      newX += actualPlayerMoveSpeed
     } else if (this.keys.a) {
-      this.x -= actualPlayerMoveSpeed
+      newX -= actualPlayerMoveSpeed
     }
     this.rotation = Math.round(-(Math.atan2(this.mouseY, this.mouseX) * 180) / Math.PI)
     if (this.rotation < 0) {
       this.rotation += 360
+    }
+    if (this.x !== newX && this.y !== newY) {
+      if (this.map.canPlayerMoveToPosition(newX, newY)) {
+        this.x = newX
+        this.y = newY
+      } else if (this.map.canPlayerMoveToPosition(this.x, newY)) {
+        this.y = newY
+      } else if (this.map.canPlayerMoveToPosition(newX, this.y)) {
+        this.x = newX
+      }
+    } else if (this.x !== newX) {
+      if (this.map.canPlayerMoveToPosition(newX, this.y)) {
+        this.x = newX
+      }
+    } else if (this.y !== newY) {
+      if (this.map.canPlayerMoveToPosition(this.x, newY)) {
+        this.y = newY
+      }
     }
     // console.log(`x: ${this.mouseX > 0}; y: ${this.mouseY > 0}`)
     // console.log(this.rotation)

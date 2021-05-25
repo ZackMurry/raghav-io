@@ -5,6 +5,7 @@ import Player from './Player'
 import { BulletMessage, DeathMessage, GameState, PlayerPositionInformation } from './types'
 import Bullet from './Bullet'
 import FadingCanvasMask from './FadingCanvasMask'
+import DefaultMap from './map/DefaultMap'
 
 export default class Game {
   state: GameState
@@ -19,6 +20,7 @@ export default class Game {
   players: { [name: string]: Body } = {}
   bullets: Bullet[] = []
   darkenMask: FadingCanvasMask
+  map: DefaultMap
 
   constructor() {
     autoBind(this)
@@ -62,7 +64,8 @@ export default class Game {
     if (!this.ws.connected) {
       console.log('WS is not connected!')
     }
-    this.player = new Player(this.canvas, this.ws)
+    this.map = new DefaultMap(this.canvas)
+    this.player = new Player(this.canvas, this.ws, this.map)
     this.player.onShoot = (angle, bulletId) => {
       const bullet = new Bullet(this.player.x, this.player.y, angle, this.player.name, this.canvas, bulletId, this.player)
       bullet.onHitPlayer = () => this.onPlayerDeath(bulletId)
@@ -108,6 +111,8 @@ export default class Game {
     // Clear previous frame
     this.context.fillStyle = '#529148'
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
+    this.map.render(this.player.x, this.player.y)
 
     // Display fps
     this.context.fillStyle = 'black'
