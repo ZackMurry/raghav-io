@@ -1,5 +1,6 @@
 import autoBind from 'auto-bind'
 import { BULLET_RADIUS, BULLET_SPEED, PLAYER_RADIUS } from './constants'
+import DefaultMap from './map/DefaultMap'
 import Player from './Player'
 
 export default class Bullet {
@@ -12,8 +13,20 @@ export default class Bullet {
   player: Player
   onHitPlayer: () => void
   shotBy: string
+  map: DefaultMap
+  onCollision: () => void
 
-  constructor(x1: number, y1: number, angle: number, shotBy: string, canvas: HTMLCanvasElement, id: string, player: Player) {
+  constructor(
+    x1: number,
+    y1: number,
+    angle: number,
+    shotBy: string,
+    canvas: HTMLCanvasElement,
+    id: string,
+    player: Player,
+    map: DefaultMap,
+    onCollision: () => void
+  ) {
     autoBind(this)
     this.x = x1
     this.y = y1
@@ -24,12 +37,17 @@ export default class Bullet {
     this.id = id
     this.player = player
     this.onHitPlayer = () => undefined
+    this.map = map
+    this.onCollision = onCollision
   }
 
   update(delta: number): void {
     const actualSpeed = delta * BULLET_SPEED
     this.x += Math.cos((Math.PI / 180) * this.angle) * actualSpeed
     this.y += Math.sin((Math.PI / 180) * this.angle) * actualSpeed
+    if (!this.map.canBulletTravelToPosition(this.x, this.y)) {
+      this.onCollision()
+    }
     if (this.player.name !== this.shotBy) {
       const xs = (this.x - this.player.x) * (this.x - this.player.x)
       const ys = (this.y - this.player.y) * (this.y - this.player.y)

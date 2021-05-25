@@ -67,7 +67,17 @@ export default class Game {
     this.map = new DefaultMap(this.canvas)
     this.player = new Player(this.canvas, this.ws, this.map)
     this.player.onShoot = (angle, bulletId) => {
-      const bullet = new Bullet(this.player.x, this.player.y, angle, this.player.name, this.canvas, bulletId, this.player)
+      const bullet = new Bullet(
+        this.player.x,
+        this.player.y,
+        angle,
+        this.player.name,
+        this.canvas,
+        bulletId,
+        this.player,
+        this.map,
+        () => this.handleBulletCollision(bulletId)
+      )
       bullet.onHitPlayer = () => this.onPlayerDeath(bulletId)
       this.bullets.push(bullet)
       setTimeout(() => {
@@ -157,7 +167,9 @@ export default class Game {
       parsed.name,
       this.canvas,
       parsed.id,
-      this.player
+      this.player,
+      this.map,
+      () => this.handleBulletCollision(parsed.id)
     )
     bullet.onHitPlayer = () => this.onPlayerDeath(bullet.id)
     this.bullets.push(bullet)
@@ -189,5 +201,9 @@ export default class Game {
         })
       })
     }
+  }
+
+  handleBulletCollision(bulletId: string): void {
+    this.bullets = this.bullets.filter(b => b.id !== bulletId)
   }
 }

@@ -1,5 +1,5 @@
 export default class CollisionUtils {
-  static doRectanglesIntercept(
+  static doRectanglesIntersect(
     ax1: number,
     ay1: number,
     ax2: number,
@@ -23,7 +23,6 @@ export default class CollisionUtils {
     if (amaxy < bminy || bmaxy < aminy) {
       return false
     }
-    console.log('intercept')
     return true
   }
 }

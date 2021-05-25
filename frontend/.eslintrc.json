@@ -41,6 +41,7 @@
     "no-use-before-define": "off",
     "indent": "off",
     "prettier/prettier": "error",
-    "lines-between-class-members": "off"
+    "lines-between-class-members": "off",
+    "no-continue": "off"
   }
 }
