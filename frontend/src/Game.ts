@@ -119,7 +119,7 @@ export default class Game {
 
   render(): void {
     // Clear previous frame
-    this.context.fillStyle = '#529148'
+    this.context.fillStyle = '#758f58'
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
     this.map.render(this.player.x, this.player.y)
