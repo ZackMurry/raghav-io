@@ -6,15 +6,22 @@ import Player from './Player'
  * A player controlled by somebody on another device
  */
 export default class Body {
-  name: string
-  x: number
-  y: number
-  rotation: number
+  name: string | null
+  x: number | null
+  y: number | null
+  rotation: number | null
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
   player: Player
 
-  constructor(name: string, x: number, y: number, rotation: number, canvas: HTMLCanvasElement, player: Player) {
+  constructor(
+    name: string | null,
+    x: number | null,
+    y: number | null,
+    rotation: number | null,
+    canvas: HTMLCanvasElement,
+    player: Player
+  ) {
     autoBind(this)
     this.name = name
     this.x = x
@@ -32,6 +39,9 @@ export default class Body {
   }
 
   render(): void {
+    if (this.x === null || this.y === null || this.rotation === null) {
+      return
+    }
     this.context.fillStyle = '#4a4e54'
     this.context.beginPath()
     this.context.ellipse(

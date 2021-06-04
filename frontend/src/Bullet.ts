@@ -48,7 +48,8 @@ export default class Bullet {
     if (!this.map.canBulletTravelToPosition(this.x, this.y)) {
       this.onCollision()
     }
-    if (this.player.name !== this.shotBy) {
+    if (this.player.id !== this.shotBy) {
+      console.log('bullet not shot by player')
       const xs = (this.x - this.player.x) * (this.x - this.player.x)
       const ys = (this.y - this.player.y) * (this.y - this.player.y)
       if (xs + ys <= PLAYER_RADIUS * PLAYER_RADIUS) {

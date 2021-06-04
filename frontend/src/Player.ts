@@ -18,20 +18,23 @@ export default class Player {
   onShoot: (angle: number, bulletId: string) => void
   isAlive = true
   map: DefaultMap
+  id: string
+  hasJoinedGame = false
 
   constructor(canvas: HTMLCanvasElement, ws: Client, map: DefaultMap) {
     autoBind(this)
+    this.ws = ws
+    this.id = generateUUID()
+    this.name = `Zack ${Math.floor(Math.random() * 100)}`
+    this.joinGame()
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
-    this.ws = ws
     this.map = map
-    this.name = `Zack ${Math.floor(Math.random() * 100)}`
     this.onShoot = () => undefined
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
     window.addEventListener('mousemove', this.onMouseMove)
     window.addEventListener('mousedown', this.onMouseDown)
-    this.sendPositionToServer()
   }
 
   update(delta: number): void {
@@ -106,6 +109,9 @@ export default class Player {
   }
 
   onMouseDown(e: MouseEvent): void {
+    if (!this.isAlive || !this.hasJoinedGame) {
+      return
+    }
     const targetOffsetX = e.pageX - this.canvas.width / 2
     const targetOffsetY = e.pageY - this.canvas.height / 2
     let angle = Math.round(-(Math.atan2(targetOffsetY, targetOffsetX) * 180) / Math.PI)
@@ -118,11 +124,11 @@ export default class Player {
   }
 
   sendPositionToServer(): void {
-    if (this.ws.connected && this.isAlive) {
+    if (this.ws.connected && this.isAlive && this.hasJoinedGame) {
       this.ws.publish({
         destination: '/app/position',
         body: JSON.stringify({
-          name: this.name,
+          playerId: this.id,
           position: {
             x: Math.round(this.x),
             y: Math.round(this.y)
@@ -135,12 +141,12 @@ export default class Player {
   }
 
   sendShotToServer(angle: number, id: string): void {
-    if (this.ws.connected) {
+    if (this.ws.connected && this.hasJoinedGame) {
       console.log('Sending shot')
       this.ws.publish({
         destination: '/app/fire',
         body: JSON.stringify({
-          name: this.name,
+          playerId: this.id,
           origin: {
             x: Math.round(this.x),
             y: Math.round(this.y)
@@ -148,6 +154,39 @@ export default class Player {
           angle,
           time: new Date().getTime(),
           id
+        })
+      })
+    }
+  }
+
+  joinGame(): void {
+    if (this.ws.connected) {
+      this.ws.publish({
+        destination: '/app/games/join',
+        body: JSON.stringify({
+          id: this.id,
+          name: this.name
+        })
+      })
+    }
+  }
+
+  onJoinedGame(): void {
+    this.hasJoinedGame = true
+    this.sendPositionToServer()
+  }
+
+  onWSConnected(): void {
+    this.joinGame()
+  }
+
+  sendIAmMessage(): void {
+    if (this.ws.connected && this.hasJoinedGame) {
+      this.ws.publish({
+        destination: '/app/games/iam',
+        body: JSON.stringify({
+          id: this.id,
+          name: this.name
         })
       })
     }

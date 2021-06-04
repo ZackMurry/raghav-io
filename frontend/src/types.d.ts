@@ -9,13 +9,13 @@ export interface PositionInformation {
 }
 
 export interface PlayerPositionInformation {
-  name: string
+  playerId: string
   position: Position
   rotation: number
 }
 
 export interface BulletMessage {
-  name: string
+  playerId: string
   origin: Position
   angle: number
   time: number
@@ -25,6 +25,16 @@ export interface BulletMessage {
 export type GameState = 'STARTING' | 'PLAYING' | 'DEAD'
 
 export interface DeathMessage {
-  name: string
+  playerId: string
   bulletId: string
+}
+
+export interface GameJoinMessage {
+  id: string
+  name: string
+}
+
+export interface IAmMessage {
+  id: string
+  name: string
 }

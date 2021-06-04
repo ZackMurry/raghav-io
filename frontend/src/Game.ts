@@ -2,7 +2,7 @@ import autoBind from 'auto-bind'
 import { Client, IMessage } from '@stomp/stompjs'
 import Body from './Body'
 import Player from './Player'
-import { BulletMessage, DeathMessage, GameState, PlayerPositionInformation } from './types'
+import { BulletMessage, DeathMessage, GameJoinMessage, GameState, IAmMessage, PlayerPositionInformation } from './types'
 import Bullet from './Bullet'
 import FadingCanvasMask from './FadingCanvasMask'
 import DefaultMap from './map/DefaultMap'
@@ -15,9 +15,11 @@ export default class Game {
   fps = 0
   fpsTimeout = 0
   frameCount = 0
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
   player: Player
   ws: Client
-  players: { [name: string]: Body } = {}
+  players: { [id: string]: Body } = {}
   bullets: Bullet[] = []
   darkenMask: FadingCanvasMask
   map: DefaultMap
@@ -34,60 +36,74 @@ export default class Game {
       throw new Error('Canvas 2D context not found')
     }
     this.ws = new Client()
+    this.map = new DefaultMap(this.canvas)
+    this.player = new Player(this.canvas, this.ws, this.map)
+    console.debug('player id: ', this.player.id)
     this.ws.configure({
       brokerURL: 'ws://localhost/api/v1/websocket',
       onConnect: () => {
         this.ws.subscribe('/topic/positions', message => {
           const parsed = JSON.parse(message.body) as PlayerPositionInformation
-          if (parsed.name === this.player.name) {
+          if (parsed.playerId === this.player.id) {
             return
           }
           // console.log(`received position of ${parsed.name}`)
-          if (this.players[parsed.name]) {
-            this.players[parsed.name].setPosition(parsed.position.x, parsed.position.y, parsed.rotation)
+          if (this.players[parsed.playerId]) {
+            this.players[parsed.playerId].setPosition(parsed.position.x, parsed.position.y, parsed.rotation)
           } else {
-            this.players[parsed.name] = new Body(
-              parsed.name,
-              parsed.position.x,
-              parsed.position.y,
-              parsed.rotation,
-              this.canvas,
-              this.player
-            )
+            this.players[parsed.playerId] = new Body(null, null, null, null, this.canvas, this.player)
           }
         })
         this.ws.subscribe('/topic/bullets', this.onBulletMessage)
         this.ws.subscribe('/topic/deaths', this.onDeathMessage)
+        this.ws.subscribe('/topic/game/join', this.onGameJoinMessage)
+        this.ws.subscribe('/topic/game/iam', this.onIAmMessage)
+        setTimeout(() => {
+          this.ws.unsubscribe('/topic/game/iam')
+        }, 10000)
       }
     })
     this.ws.activate()
-    if (!this.ws.connected) {
-      console.log('WS is not connected!')
-    }
-    this.map = new DefaultMap(this.canvas)
-    this.player = new Player(this.canvas, this.ws, this.map)
-    this.player.onShoot = (angle, bulletId) => {
-      const bullet = new Bullet(
-        this.player.x,
-        this.player.y,
-        angle,
-        this.player.name,
-        this.canvas,
-        bulletId,
-        this.player,
-        this.map,
-        () => this.handleBulletCollision(bulletId)
-      )
-      bullet.onHitPlayer = () => this.onPlayerDeath(bulletId)
-      this.bullets.push(bullet)
-      setTimeout(() => {
-        this.bullets = this.bullets.filter(b => b.id !== bulletId)
-      }, 5000)
-    }
-    window.addEventListener('resize', this.onResize)
-    this.onResize()
     this.darkenMask = new FadingCanvasMask(0, 0, 0, 2500, 0.4, this.canvas)
-    this.main(0)
+    new Promise<void>((resolve, reject) => {
+      let attemptsRemaining = 15
+      const intervalTimeMs = 200
+      const interval = setInterval(() => {
+        if (attemptsRemaining <= 0) {
+          clearInterval(interval)
+          reject(new Error('Failed to connect to WS server'))
+        } else if (this.ws.connected) {
+          clearInterval(interval)
+          resolve()
+        }
+        attemptsRemaining--
+      }, intervalTimeMs)
+    })
+      .then(() => {
+        this.player.onWSConnected()
+        this.player.onShoot = (angle, bulletId) => {
+          const bullet = new Bullet(
+            this.player.x,
+            this.player.y,
+            angle,
+            this.player.id,
+            this.canvas,
+            bulletId,
+            this.player,
+            this.map,
+            () => this.handleBulletCollision(bulletId)
+          )
+          bullet.onHitPlayer = () => this.onPlayerDeath(bulletId)
+          this.bullets.push(bullet)
+          setTimeout(() => {
+            this.bullets = this.bullets.filter(b => b.id !== bulletId)
+          }, 5000)
+        }
+        window.addEventListener('resize', this.onResize)
+        this.onResize()
+        this.main(0)
+      })
+      .catch(console.error)
   }
 
   main(time: number): void {
@@ -157,14 +173,14 @@ export default class Game {
 
   onBulletMessage(message: IMessage): void {
     const parsed = JSON.parse(message.body) as BulletMessage
-    if (parsed.name === this.player.name) {
+    if (parsed.playerId === this.player.id) {
       return
     }
     const bullet = new Bullet(
       parsed.origin.x,
       parsed.origin.y,
       parsed.angle,
-      parsed.name,
+      parsed.playerId,
       this.canvas,
       parsed.id,
       this.player,
@@ -179,12 +195,12 @@ export default class Game {
   }
 
   onDeathMessage(message: IMessage): void {
-    const { name, bulletId } = JSON.parse(message.body) as DeathMessage
-    if (name === this.player.name) {
+    const { playerId, bulletId } = JSON.parse(message.body) as DeathMessage
+    if (playerId === this.player.id) {
       return
     }
     this.bullets = this.bullets.filter(b => b.id !== bulletId)
-    delete this.players[name]
+    delete this.players[playerId]
   }
 
   onPlayerDeath(bulletId: string): void {
@@ -196,7 +212,7 @@ export default class Game {
       this.ws.publish({
         destination: '/app/death',
         body: JSON.stringify({
-          name: this.player.name,
+          playerId: this.player.id,
           bulletId
         })
       })
@@ -205,5 +221,25 @@ export default class Game {
 
   handleBulletCollision(bulletId: string): void {
     this.bullets = this.bullets.filter(b => b.id !== bulletId)
+  }
+
+  onGameJoinMessage(message: IMessage): void {
+    const { id, name } = JSON.parse(message.body) as GameJoinMessage
+    if (id === this.player.id) {
+      this.player.onJoinedGame()
+    }
+    this.players[id] = new Body(name, null, null, null, this.canvas, this.player)
+    this.player.sendIAmMessage()
+  }
+
+  onIAmMessage(message: IMessage): void {
+    const { id, name } = JSON.parse(message.body) as IAmMessage
+    if (this.players[id]) {
+      if (this.players[id].name === null) {
+        this.players[id].name = name
+      }
+      return
+    }
+    this.players[id] = new Body(name, null, null, null, this.canvas, this.player)
   }
 }
