@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link href="http://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
@@ -10,31 +11,38 @@
     <title>Raghav.io</title>
   </head>
   <body>
-    <div id="menu-container">
-      <h1 class="title-text">RAGHAV.io</h1>
-      <div class="flex-center" id="menu-details-container">
-        <form id="details-form">
-          <input
-            aria-required="true"
-            id="name-input"
-            class="text-input"
-            type="text"
-            placeholder="Enter name"
-            maxlength="32"
-            autocomplete="username"
-            name="username"
-          />
-          <input
-            aria-required="true"
-            id="game-id-input"
-            class="text-input"
-            type="text"
-            placeholder="Enter game id"
-            maxlength="32"
-            name="gameId"
-          />
-          <button type="submit" class="menu-button" id="details-form-submit-btn">Enter Game</button>
-        </form>
+    <div id="start-menu">
+      <div id="menu-container">
+        <h1 class="title-text">RAGHAV.io</h1>
+        <div class="flex-center" id="menu-details-container">
+          <form id="details-form">
+            <input
+              aria-required="true"
+              id="name-input"
+              class="text-input"
+              type="text"
+              placeholder="Enter name"
+              maxlength="32"
+              autocomplete="username"
+              name="username"
+            />
+            <input
+              aria-required="true"
+              id="game-id-input"
+              class="text-input"
+              type="text"
+              placeholder="Enter game id"
+              maxlength="32"
+              name="gameId"
+            />
+            <button type="submit" class="menu-button" id="details-form-submit-btn">Enter Game</button>
+          </form>
+        </div>
+        <footer id="start-menu-footer">
+          <a href="https://github.com/ZackMurry/raghav-io" rel="noreferrer noopener" target="_blank">GitHub</a>
+          |
+          <a href="https://github.com/ZackMurry" rel="noreferrer noopener" target="_blank">Created by Zack Murry</a>
+        </footer>
       </div>
     </div>
     <canvas id="game"></canvas>

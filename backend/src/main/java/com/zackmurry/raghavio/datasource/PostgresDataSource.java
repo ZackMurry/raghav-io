@@ -1,4 +1,4 @@
-package com.zackmurry.onevoneio.datasource;
+package com.zackmurry.raghavio.datasource;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;

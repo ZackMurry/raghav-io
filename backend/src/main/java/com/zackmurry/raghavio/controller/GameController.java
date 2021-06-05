@@ -1,7 +1,7 @@
-package com.zackmurry.onevoneio.controller;
+package com.zackmurry.raghavio.controller;
 
-import com.zackmurry.onevoneio.model.GameJoinMessage;
-import com.zackmurry.onevoneio.model.IAmMessage;
+import com.zackmurry.raghavio.model.GameJoinMessage;
+import com.zackmurry.raghavio.model.IAmMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

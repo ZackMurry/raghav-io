@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.zackmurry</groupId>
-	<artifactId>1v1-io-backend</artifactId>
+	<artifactId>raghav-io-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>1v1-io-backend</name>
-	<description>Backend for 1v1-io</description>
+	<name>raghav-io-backend</name>
+	<description>Backend for raghav.io</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>

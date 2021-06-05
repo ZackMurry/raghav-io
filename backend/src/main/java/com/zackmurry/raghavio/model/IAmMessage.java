@@ -1,4 +1,4 @@
-package com.zackmurry.onevoneio.model;
+package com.zackmurry.raghavio.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.zackmurry.onevoneio.model;
+package com.zackmurry.raghavio.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameJoinMessage {
-    UUID id;
-    String name;
+public class PositionMessage {
+
+    private UUID playerId;
+    private Position position;
+    private short rotation;
+
 }

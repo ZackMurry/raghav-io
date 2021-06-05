@@ -8,6 +8,5 @@ export const WALL_THICKNESS = 20
 export const NAME_HEIGHT_ABOVE_PLAYER = 75
 export const GUN_LENGTH = 60
 export const GUN_WIDTH = 14
-// export const OUTLINE_COLOR = '#35354d'
-// export const OUTLINE_COLOR = '#1b1b26'
 export const OUTLINE_COLOR = '#272736'
+export const TIME_BETWEEN_SHOTS_MS = 200

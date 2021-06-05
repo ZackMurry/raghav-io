@@ -1,4 +1,4 @@
-package com.zackmurry.onevoneio.config;
+package com.zackmurry.raghavio.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

@@ -1,4 +1,4 @@
-package com.zackmurry.onevoneio.config;
+package com.zackmurry.raghavio.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

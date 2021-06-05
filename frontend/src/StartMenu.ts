@@ -11,7 +11,7 @@ export default class StartMenu {
     autoBind(this)
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
-    this.menuElement = document.getElementById('menu-container') as HTMLDivElement
+    this.menuElement = document.getElementById('start-menu') as HTMLDivElement
     const formElement = document.getElementById('details-form') as HTMLFormElement
     formElement.onsubmit = this.onEnterGame
   }

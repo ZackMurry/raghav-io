@@ -9,7 +9,7 @@ html {
   margin: 0;
   padding: 0;
   image-rendering: optimizeSpeed;
-  background-color: #758f58;
+  background-color: #3a472c;
 }
 
 #game {
@@ -34,6 +34,82 @@ html {
   user-select: none;
 }
 
+@media screen and (max-width: 319px) {
+  .title-text {
+    font-size: 40px;
+  }
+
+  .text-input {
+    font-size: 15px;
+  }
+
+  #start-menu-footer {
+    font-size: 12px;
+  }
+}
+
+@media screen and (min-width: 320px) {
+  .title-text {
+    font-size: 50px;
+  }
+
+  .text-input {
+    font-size: 20px;
+  }
+
+  #start-menu-footer {
+    font-size: 14px;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .title-text {
+    font-size: 75px;
+  }
+
+  .text-input {
+    font-size: 25px;
+  }
+
+  #start-menu-footer {
+    font-size: 18px;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .title-text {
+    font-size: 100px;
+  }
+
+  .text-input {
+    font-size: 25px;
+  }
+
+  #start-menu-footer {
+    font-size: 24px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .title-text {
+    font-size: 130px;
+  }
+
+  .text-input {
+    font-size: 25px;
+  }
+}
+
+@media screen and (min-width: 1500px) {
+  .title-text {
+    font-size: 170px;
+  }
+
+  .text-input {
+    font-size: 25px;
+  }
+}
+
 .flex-center {
   display: flex;
   justify-content: center;
@@ -53,7 +129,7 @@ html {
 .text-input {
   font-family: var(--fonts);
   text-align: center;
-  font-size: 25px;
+  /* font-size: 25px; */
   padding: 6px;
   border: none;
   outline: none;
@@ -85,4 +161,18 @@ html {
 
 #details-form-submit-btn {
   margin-top: 10px;
+}
+
+#start-menu-footer {
+  position: fixed;
+  top: calc(85vh - 100px);
+  left: 50%;
+  width: 90vw;
+  transform: translate(-50%, 0%);
+  color: #e5e5e5;
+}
+
+#start-menu-footer > a {
+  color: #e5e5e5;
+  text-decoration: none;
 }

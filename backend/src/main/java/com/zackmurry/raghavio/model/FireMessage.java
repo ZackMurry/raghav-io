@@ -1,4 +1,4 @@
-package com.zackmurry.onevoneio.model;
+package com.zackmurry.raghavio.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +11,13 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeathMessage {
+public class FireMessage {
 
+    // todo use player ids instead of names
     private UUID playerId;
-    private UUID bulletId;
+    private Position origin;
+    private short angle;
+    private long time;
+    private UUID id;
 
 }

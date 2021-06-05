@@ -8,7 +8,8 @@ import {
   OUTLINE_COLOR,
   PLAYER_MOVE_SPEED,
   PLAYER_RADIUS,
-  POSITION_UPDATE_TIME
+  POSITION_UPDATE_TIME,
+  TIME_BETWEEN_SHOTS_MS
 } from './constants'
 import DefaultMap from './map/DefaultMap'
 import { IAmMessage } from './types'
@@ -30,6 +31,7 @@ export default class Player {
   id: string
   hasJoinedGame = false
   gameId: string | null = null
+  lastShot = 0
 
   constructor(canvas: HTMLCanvasElement, ws: Client, map: DefaultMap) {
     autoBind(this)
@@ -86,8 +88,6 @@ export default class Player {
         this.y = newY
       }
     }
-    // console.log(`x: ${this.mouseX > 0}; y: ${this.mouseY > 0}`)
-    // console.log(this.rotation)
   }
 
   render(): void {
@@ -136,6 +136,10 @@ export default class Player {
     if (!this.isAlive || !this.hasJoinedGame) {
       return
     }
+    if (new Date().getTime() - TIME_BETWEEN_SHOTS_MS < this.lastShot) {
+      return
+    }
+    this.lastShot = new Date().getTime()
     // todo make bullet origin at end of gun
     const targetOffsetX = e.pageX - this.canvas.width / 2
     const targetOffsetY = e.pageY - this.canvas.height / 2
