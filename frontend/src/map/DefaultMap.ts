@@ -1,5 +1,5 @@
 import autoBind from 'auto-bind'
-import { BULLET_RADIUS, PLAYER_COLLISION_LENIENCY, PLAYER_RADIUS } from '../constants'
+import { BULLET_RADIUS, PLAYER_COLLISION_LENIENCY, PLAYER_RADIUS, WALL_THICKNESS } from '../constants'
 import CollisionUtils from './CollisionUtils'
 import MapObject from './MapObject'
 import Wall from './Wall'

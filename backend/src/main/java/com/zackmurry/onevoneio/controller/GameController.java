@@ -1,6 +1,5 @@
 package com.zackmurry.onevoneio.controller;
 
-import com.zackmurry.onevoneio.model.DeathMessage;
 import com.zackmurry.onevoneio.model.GameJoinMessage;
 import com.zackmurry.onevoneio.model.IAmMessage;
 import org.slf4j.Logger;

@@ -8,6 +8,8 @@ html {
   color: #4a4a4a;
   margin: 0;
   padding: 0;
+  image-rendering: optimizeSpeed;
+  background-color: #758f58;
 }
 
 #game {

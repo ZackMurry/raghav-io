@@ -90,7 +90,7 @@ export default class Player {
 
   render(): void {
     this.context.fillStyle = '#7d5d4f'
-    this.context.strokeStyle = '#35354d'
+    this.context.strokeStyle = OUTLINE_COLOR
     this.context.lineWidth = 10
     this.context.beginPath()
     this.context.ellipse(this.canvas.width / 2, this.canvas.height / 2, PLAYER_RADIUS, PLAYER_RADIUS, 0, 0, 2 * Math.PI)
@@ -100,13 +100,11 @@ export default class Player {
     this.context.fill()
 
     this.context.save()
-    this.context.font = 'bold 26px "Hammersmith One"'
+    this.context.font = 'bold 22px "Hammersmith One"'
     this.context.fillStyle = 'white'
     this.context.textAlign = 'center'
     this.context.lineWidth = 6
     this.context.strokeStyle = OUTLINE_COLOR
-    this.context.shadowColor = OUTLINE_COLOR
-    this.context.shadowBlur = 1
     this.context.strokeText(this.name, this.canvas.width / 2, this.canvas.height / 2 - NAME_HEIGHT_ABOVE_PLAYER)
     this.context.fillText(this.name, this.canvas.width / 2, this.canvas.height / 2 - NAME_HEIGHT_ABOVE_PLAYER)
     this.context.restore()
@@ -114,7 +112,7 @@ export default class Player {
     this.context.save()
     this.context.translate(this.canvas.width / 2, this.canvas.height / 2)
     this.context.rotate((-this.rotation * Math.PI) / 180)
-    this.context.fillStyle = '#35354d'
+    this.context.fillStyle = OUTLINE_COLOR
     this.context.fillRect(GUN_WIDTH / 2, -GUN_WIDTH / 2, GUN_LENGTH, GUN_WIDTH)
     this.context.restore()
   }

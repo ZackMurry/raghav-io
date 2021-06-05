@@ -40,7 +40,6 @@ export default class Body {
 
   render(): void {
     if (this.x === null || this.y === null || this.rotation === null) {
-      console.log('returning ', this.x, this.y, this.rotation, this.name)
       return
     }
     this.context.fillStyle = '#7d5d4f'
@@ -76,8 +75,6 @@ export default class Body {
       this.context.textAlign = 'center'
       this.context.lineWidth = 6
       this.context.strokeStyle = OUTLINE_COLOR
-      this.context.shadowColor = OUTLINE_COLOR
-      this.context.shadowBlur = 1
       this.context.strokeText(
         this.name,
         this.canvas.width / 2 + this.x - this.player.x,
