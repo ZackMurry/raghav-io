@@ -1,5 +1,7 @@
 import Game from './Game'
+import './style.css'
 
 window.onload = () => {
-  const game = new Game()
+  // eslint-disable-next-line no-new
+  new Game()
 }
