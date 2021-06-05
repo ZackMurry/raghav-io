@@ -1,7 +1,15 @@
 import { Client } from '@stomp/stompjs'
 import autoBind from 'auto-bind'
 import { v4 as generateUUID } from 'uuid'
-import { PLAYER_MOVE_SPEED, PLAYER_RADIUS, POSITION_UPDATE_TIME } from './constants'
+import {
+  GUN_LENGTH,
+  GUN_WIDTH,
+  NAME_HEIGHT_ABOVE_PLAYER,
+  OUTLINE_COLOR,
+  PLAYER_MOVE_SPEED,
+  PLAYER_RADIUS,
+  POSITION_UPDATE_TIME
+} from './constants'
 import DefaultMap from './map/DefaultMap'
 
 export default class Player {
@@ -26,7 +34,6 @@ export default class Player {
     this.ws = ws
     this.id = generateUUID()
     this.name = `Zack ${Math.floor(Math.random() * 100)}`
-    this.joinGame()
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
     this.map = map
@@ -82,16 +89,33 @@ export default class Player {
   }
 
   render(): void {
-    this.context.fillStyle = '#4a4e54'
+    this.context.fillStyle = '#7d5d4f'
+    this.context.strokeStyle = '#35354d'
+    this.context.lineWidth = 10
+    this.context.beginPath()
+    this.context.ellipse(this.canvas.width / 2, this.canvas.height / 2, PLAYER_RADIUS, PLAYER_RADIUS, 0, 0, 2 * Math.PI)
+    this.context.stroke()
     this.context.beginPath()
     this.context.ellipse(this.canvas.width / 2, this.canvas.height / 2, PLAYER_RADIUS, PLAYER_RADIUS, 0, 0, 2 * Math.PI)
     this.context.fill()
 
     this.context.save()
+    this.context.font = 'bold 26px "Hammersmith One"'
+    this.context.fillStyle = 'white'
+    this.context.textAlign = 'center'
+    this.context.lineWidth = 6
+    this.context.strokeStyle = OUTLINE_COLOR
+    this.context.shadowColor = OUTLINE_COLOR
+    this.context.shadowBlur = 1
+    this.context.strokeText(this.name, this.canvas.width / 2, this.canvas.height / 2 - NAME_HEIGHT_ABOVE_PLAYER)
+    this.context.fillText(this.name, this.canvas.width / 2, this.canvas.height / 2 - NAME_HEIGHT_ABOVE_PLAYER)
+    this.context.restore()
+
+    this.context.save()
     this.context.translate(this.canvas.width / 2, this.canvas.height / 2)
     this.context.rotate((-this.rotation * Math.PI) / 180)
-    this.context.fillStyle = 'black'
-    this.context.fillRect(5, -5, 25, 10)
+    this.context.fillStyle = '#35354d'
+    this.context.fillRect(GUN_WIDTH / 2, -GUN_WIDTH / 2, GUN_LENGTH, GUN_WIDTH)
     this.context.restore()
   }
 
@@ -112,6 +136,7 @@ export default class Player {
     if (!this.isAlive || !this.hasJoinedGame) {
       return
     }
+    // todo make bullet origin at end of gun
     const targetOffsetX = e.pageX - this.canvas.width / 2
     const targetOffsetY = e.pageY - this.canvas.height / 2
     let angle = Math.round(-(Math.atan2(targetOffsetY, targetOffsetX) * 180) / Math.PI)
@@ -174,10 +199,6 @@ export default class Player {
   onJoinedGame(): void {
     this.hasJoinedGame = true
     this.sendPositionToServer()
-  }
-
-  onWSConnected(): void {
-    this.joinGame()
   }
 
   sendIAmMessage(): void {

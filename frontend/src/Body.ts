@@ -1,5 +1,5 @@
 import autoBind from 'auto-bind'
-import { PLAYER_RADIUS } from './constants'
+import { GUN_LENGTH, GUN_WIDTH, NAME_HEIGHT_ABOVE_PLAYER, OUTLINE_COLOR, PLAYER_RADIUS } from './constants'
 import Player from './Player'
 
 /**
@@ -40,9 +40,23 @@ export default class Body {
 
   render(): void {
     if (this.x === null || this.y === null || this.rotation === null) {
+      console.log('returning ', this.x, this.y, this.rotation, this.name)
       return
     }
-    this.context.fillStyle = '#4a4e54'
+    this.context.fillStyle = '#7d5d4f'
+    this.context.strokeStyle = OUTLINE_COLOR
+    this.context.lineWidth = 10
+    this.context.beginPath()
+    this.context.ellipse(
+      this.canvas.width / 2 + this.x - this.player.x,
+      this.canvas.height / 2 - this.y + this.player.y,
+      PLAYER_RADIUS,
+      PLAYER_RADIUS,
+      0,
+      0,
+      2 * Math.PI
+    )
+    this.context.stroke()
     this.context.beginPath()
     this.context.ellipse(
       this.canvas.width / 2 + this.x - this.player.x,
@@ -55,11 +69,33 @@ export default class Body {
     )
     this.context.fill()
 
+    if (this.name !== null) {
+      this.context.save()
+      this.context.font = 'bold 26px "Hammersmith One"'
+      this.context.fillStyle = 'white'
+      this.context.textAlign = 'center'
+      this.context.lineWidth = 6
+      this.context.strokeStyle = OUTLINE_COLOR
+      this.context.shadowColor = OUTLINE_COLOR
+      this.context.shadowBlur = 1
+      this.context.strokeText(
+        this.name,
+        this.canvas.width / 2 + this.x - this.player.x,
+        this.canvas.height / 2 - NAME_HEIGHT_ABOVE_PLAYER - this.y + this.player.y
+      )
+      this.context.fillText(
+        this.name,
+        this.canvas.width / 2 + this.x - this.player.x,
+        this.canvas.height / 2 - NAME_HEIGHT_ABOVE_PLAYER - this.y + this.player.y
+      )
+      this.context.restore()
+    }
+
     this.context.save()
     this.context.translate(this.canvas.width / 2 + this.x - this.player.x, this.canvas.height / 2 - this.y + this.player.y)
     this.context.rotate((-this.rotation * Math.PI) / 180)
-    this.context.fillStyle = 'black'
-    this.context.fillRect(5, -5, 25, 10)
+    this.context.fillStyle = OUTLINE_COLOR
+    this.context.fillRect(GUN_WIDTH / 2, -GUN_WIDTH / 2, GUN_LENGTH, GUN_WIDTH)
     this.context.restore()
   }
 }

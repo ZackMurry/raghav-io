@@ -6,6 +6,7 @@ import { BulletMessage, DeathMessage, GameJoinMessage, GameState, IAmMessage, Pl
 import Bullet from './Bullet'
 import FadingCanvasMask from './FadingCanvasMask'
 import DefaultMap from './map/DefaultMap'
+import StartMenu from './StartMenu'
 
 export default class Game {
   state: GameState
@@ -23,10 +24,12 @@ export default class Game {
   bullets: Bullet[] = []
   darkenMask: FadingCanvasMask
   map: DefaultMap
+  startMenu: StartMenu
+  gameId: string | null = null
 
   constructor() {
     autoBind(this)
-    this.state = 'PLAYING'
+    this.state = 'STARTING'
     this.canvas = document.getElementById('game') as HTMLCanvasElement
     if (!this.canvas) {
       throw new Error('Canvas not found')
@@ -37,6 +40,8 @@ export default class Game {
     }
     this.ws = new Client()
     this.map = new DefaultMap(this.canvas)
+    this.startMenu = new StartMenu(this.canvas)
+    this.startMenu.onJoinGame = this.onJoinGame
     this.player = new Player(this.canvas, this.ws, this.map)
     console.debug('player id: ', this.player.id)
     this.ws.configure({
@@ -80,7 +85,6 @@ export default class Game {
       }, intervalTimeMs)
     })
       .then(() => {
-        this.player.onWSConnected()
         this.player.onShoot = (angle, bulletId) => {
           const bullet = new Bullet(
             this.player.x,
@@ -148,8 +152,8 @@ export default class Game {
       this.canvas.width - 200,
       50
     )
-    Object.values(this.players).forEach(b => b.render())
     this.bullets.forEach(b => b.render())
+    Object.values(this.players).forEach(b => b.render())
 
     if (this.state === 'PLAYING') {
       this.player.render()
@@ -208,6 +212,7 @@ export default class Game {
     this.player.isAlive = false
     this.bullets = this.bullets.filter(b => b.id !== bulletId)
     this.darkenMask.fadeIn()
+    this.startMenu.setVisibility(true)
     if (this.ws.connected) {
       this.ws.publish({
         destination: '/app/death',
@@ -225,6 +230,7 @@ export default class Game {
 
   onGameJoinMessage(message: IMessage): void {
     const { id, name } = JSON.parse(message.body) as GameJoinMessage
+    console.log(name, ' joined the game')
     if (id === this.player.id) {
       this.player.onJoinedGame()
     }
@@ -241,5 +247,18 @@ export default class Game {
       return
     }
     this.players[id] = new Body(name, null, null, null, this.canvas, this.player)
+  }
+
+  onJoinGame(username: string, gameId: string): void {
+    this.player.name = username
+    this.player.x = 0
+    this.player.y = 0
+    this.player.isAlive = true
+    this.gameId = gameId
+    this.state = 'PLAYING'
+    this.startMenu.setVisibility(false)
+    this.darkenMask.fadeDir = -1
+    this.player.joinGame()
+    this.player.hasJoinedGame = true
   }
 }

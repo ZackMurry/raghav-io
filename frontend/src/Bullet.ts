@@ -1,5 +1,5 @@
 import autoBind from 'auto-bind'
-import { BULLET_RADIUS, BULLET_SPEED, PLAYER_RADIUS } from './constants'
+import { BULLET_RADIUS, BULLET_SPEED, OUTLINE_COLOR, PLAYER_RADIUS } from './constants'
 import DefaultMap from './map/DefaultMap'
 import Player from './Player'
 
@@ -49,17 +49,16 @@ export default class Bullet {
       this.onCollision()
     }
     if (this.player.id !== this.shotBy) {
-      console.log('bullet not shot by player')
       const xs = (this.x - this.player.x) * (this.x - this.player.x)
       const ys = (this.y - this.player.y) * (this.y - this.player.y)
-      if (xs + ys <= PLAYER_RADIUS * PLAYER_RADIUS) {
+      if (xs + ys <= PLAYER_RADIUS * PLAYER_RADIUS && this.player.isAlive) {
         this.onHitPlayer()
       }
     }
   }
 
   render(): void {
-    this.context.fillStyle = 'black'
+    this.context.fillStyle = OUTLINE_COLOR
     this.context.save()
     // this.context.translate(this.canvas.width / 2 + this.x - this.player.x, this.canvas.height / 2 - this.y + this.player.y)
     this.context.beginPath()

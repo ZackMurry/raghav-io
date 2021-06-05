@@ -19,7 +19,7 @@ public class FireController {
 
     @MessageMapping("/fire")
     public void updatePosition(FireMessage fireMessage) {
-        logger.info("{} shot a bullet from ({}, {}) with a rotation of {} degrees", fireMessage.getName(), fireMessage.getOrigin().getX(), fireMessage.getOrigin().getY(), fireMessage.getAngle());
+        logger.info("{} shot a bullet from ({}, {}) with a rotation of {} degrees", fireMessage.getPlayerId(), fireMessage.getOrigin().getX(), fireMessage.getOrigin().getY(), fireMessage.getAngle());
         simpMessagingTemplate.convertAndSend("/topic/bullets", fireMessage);
     }
 

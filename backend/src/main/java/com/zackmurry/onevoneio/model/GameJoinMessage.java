@@ -1,2 +1,17 @@
-package com.zackmurry.onevoneio.model;public class GameJoinMessage {
+package com.zackmurry.onevoneio.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class GameJoinMessage {
+    UUID id;
+    String name;
 }

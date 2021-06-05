@@ -19,7 +19,7 @@ public class DeathController {
 
     @MessageMapping("/death")
     public void updatePosition(DeathMessage deathMessage) {
-        logger.info("{} died", deathMessage.getName());
+        logger.info("{} died", deathMessage.getPlayerId());
         simpMessagingTemplate.convertAndSend("/topic/deaths", deathMessage);
     }
 

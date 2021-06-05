@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,10 +14,10 @@ import lombok.Setter;
 public class FireMessage {
 
     // todo use player ids instead of names
-    private String name;
+    private UUID playerId;
     private Position origin;
     private short angle;
     private long time;
-    private String id;
+    private UUID id;
 
 }

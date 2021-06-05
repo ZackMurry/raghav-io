@@ -1,15 +1,86 @@
 body,
 html {
-  font-family: 'Roboto', Avenir, Helvetica, Arial, sans-serif;
+  --fonts: 'Hammersmith One', Roboto, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--fonts);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #4a4a4a;
   margin: 0;
   padding: 0;
 }
 
 #game {
-  font-family: Arial, Helvetica, sans-serif;
   display: block;
+}
+
+#menu-container {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, -50%);
+}
+
+.title-text {
+  color: white;
+  text-align: center;
+  font-size: 170px;
+  line-height: 25%;
+  padding-bottom: 5vh;
+  text-shadow: 0 1px 0 #c4c4c4, 0 2px 0 #c4c4c4, 0 3px 0 #c4c4c4, 0 4px 0 #c4c4c4, 0 5px 0 #c4c4c4, 0 6px 0 #c4c4c4,
+    0 7px 0 #c4c4c4, 0 8px 0 #c4c4c4, 0 9px 0 #c4c4c4;
+  user-select: none;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+}
+
+#details-form {
+  background-color: white;
+  box-shadow: 0 7px #c4c4c4;
+  padding: 25px 18px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-input {
+  font-family: var(--fonts);
+  text-align: center;
+  font-size: 25px;
+  padding: 6px;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  color: #4a4a4a;
+  background-color: #e5e3e3;
+  width: 100%;
+  border-radius: 4px;
+  margin: 4px;
+}
+
+.menu-button {
+  text-align: center;
+  font-size: 23px;
+  padding: 6px;
+  color: #fff;
+  background-color: #5abc69;
+  width: 100%;
+  border-radius: 4px;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--fonts);
+}
+
+.menu-button:hover {
+  background-color: #52b260;
+}
+
+#details-form-submit-btn {
+  margin-top: 10px;
 }
