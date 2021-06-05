@@ -5,6 +5,7 @@ import com.zackmurry.onevoneio.model.FireMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -17,10 +18,10 @@ public class DeathController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/death")
-    public void updatePosition(DeathMessage deathMessage) {
+    @MessageMapping("/games/{gameId}/death")
+    public void updatePosition(@DestinationVariable String gameId, DeathMessage deathMessage) {
         logger.info("{} died", deathMessage.getPlayerId());
-        simpMessagingTemplate.convertAndSend("/topic/deaths", deathMessage);
+        simpMessagingTemplate.convertAndSend("/topic/games/" + gameId + "/deaths", deathMessage);
     }
 
 }

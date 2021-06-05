@@ -37,4 +37,6 @@ export interface GameJoinMessage {
 export interface IAmMessage {
   id: string
   name: string
+  position: Position
+  rotation: number
 }

@@ -11,6 +11,7 @@ import {
   POSITION_UPDATE_TIME
 } from './constants'
 import DefaultMap from './map/DefaultMap'
+import { IAmMessage } from './types'
 
 export default class Player {
   x = 0
@@ -28,6 +29,7 @@ export default class Player {
   map: DefaultMap
   id: string
   hasJoinedGame = false
+  gameId: string | null = null
 
   constructor(canvas: HTMLCanvasElement, ws: Client, map: DefaultMap) {
     autoBind(this)
@@ -149,7 +151,7 @@ export default class Player {
   sendPositionToServer(): void {
     if (this.ws.connected && this.isAlive && this.hasJoinedGame) {
       this.ws.publish({
-        destination: '/app/position',
+        destination: `/app/games/${this.gameId}/position`,
         body: JSON.stringify({
           playerId: this.id,
           position: {
@@ -167,7 +169,7 @@ export default class Player {
     if (this.ws.connected && this.hasJoinedGame) {
       console.log('Sending shot')
       this.ws.publish({
-        destination: '/app/fire',
+        destination: `/app/games/${this.gameId}/fire`,
         body: JSON.stringify({
           playerId: this.id,
           origin: {
@@ -182,10 +184,11 @@ export default class Player {
     }
   }
 
-  joinGame(): void {
+  joinGame(gameId: string): void {
+    this.gameId = gameId
     if (this.ws.connected) {
       this.ws.publish({
-        destination: '/app/games/join',
+        destination: `/app/games/${gameId}/join`,
         body: JSON.stringify({
           id: this.id,
           name: this.name
@@ -201,12 +204,18 @@ export default class Player {
 
   sendIAmMessage(): void {
     if (this.ws.connected && this.hasJoinedGame) {
+      console.log('sending iam message...')
       this.ws.publish({
-        destination: '/app/games/iam',
+        destination: `/app/games/${this.gameId}/iam`,
         body: JSON.stringify({
           id: this.id,
-          name: this.name
-        })
+          name: this.name,
+          position: {
+            x: this.x,
+            y: this.y
+          },
+          rotation: this.rotation
+        } as IAmMessage)
       })
     }
   }

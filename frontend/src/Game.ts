@@ -47,44 +47,6 @@ export default class Game {
     this.ws.configure({
       brokerURL: 'ws://localhost/api/v1/websocket',
       onConnect: () => {
-        this.ws.subscribe('/topic/positions', message => {
-          const parsed = JSON.parse(message.body) as PlayerPositionInformation
-          if (parsed.playerId === this.player.id) {
-            return
-          }
-          // console.log(`received position of ${parsed.name}`)
-          if (this.players[parsed.playerId]) {
-            this.players[parsed.playerId].setPosition(parsed.position.x, parsed.position.y, parsed.rotation)
-          } else {
-            this.players[parsed.playerId] = new Body(null, null, null, null, this.canvas, this.player)
-          }
-        })
-        this.ws.subscribe('/topic/bullets', this.onBulletMessage)
-        this.ws.subscribe('/topic/deaths', this.onDeathMessage)
-        this.ws.subscribe('/topic/game/join', this.onGameJoinMessage)
-        this.ws.subscribe('/topic/game/iam', this.onIAmMessage)
-        setTimeout(() => {
-          this.ws.unsubscribe('/topic/game/iam')
-        }, 10000)
-      }
-    })
-    this.ws.activate()
-    this.darkenMask = new FadingCanvasMask(0, 0, 0, 2500, 0.4, this.canvas)
-    new Promise<void>((resolve, reject) => {
-      let attemptsRemaining = 15
-      const intervalTimeMs = 200
-      const interval = setInterval(() => {
-        if (attemptsRemaining <= 0) {
-          clearInterval(interval)
-          reject(new Error('Failed to connect to WS server'))
-        } else if (this.ws.connected) {
-          clearInterval(interval)
-          resolve()
-        }
-        attemptsRemaining--
-      }, intervalTimeMs)
-    })
-      .then(() => {
         this.player.onShoot = (angle, bulletId) => {
           const bullet = new Bullet(
             this.player.x,
@@ -106,8 +68,10 @@ export default class Game {
         window.addEventListener('resize', this.onResize)
         this.onResize()
         this.main(0)
-      })
-      .catch(console.error)
+      }
+    })
+    this.ws.activate()
+    this.darkenMask = new FadingCanvasMask(0, 0, 0, 2500, 0.4, this.canvas)
   }
 
   main(time: number): void {
@@ -233,20 +197,52 @@ export default class Game {
     console.log(name, ' joined the game')
     if (id === this.player.id) {
       this.player.onJoinedGame()
+      return
     }
     this.players[id] = new Body(name, null, null, null, this.canvas, this.player)
     this.player.sendIAmMessage()
   }
 
   onIAmMessage(message: IMessage): void {
-    const { id, name } = JSON.parse(message.body) as IAmMessage
+    const { id, name, position, rotation } = JSON.parse(message.body) as IAmMessage
+    if (id === this.player.id) {
+      return
+    }
     if (this.players[id]) {
       if (this.players[id].name === null) {
         this.players[id].name = name
       }
       return
     }
-    this.players[id] = new Body(name, null, null, null, this.canvas, this.player)
+    this.players[id] = new Body(name, position.x, position.y, rotation, this.canvas, this.player)
+  }
+
+  subscribeToWSChannels(): void {
+    this.ws.subscribe(`/topic/games/${this.gameId}/positions`, message => {
+      const parsed = JSON.parse(message.body) as PlayerPositionInformation
+      if (parsed.playerId === this.player.id) {
+        return
+      }
+      if (this.players[parsed.playerId]) {
+        this.players[parsed.playerId].setPosition(parsed.position.x, parsed.position.y, parsed.rotation)
+      } else {
+        this.players[parsed.playerId] = new Body(
+          null,
+          parsed.position.x,
+          parsed.position.y,
+          parsed.rotation,
+          this.canvas,
+          this.player
+        )
+      }
+    })
+    this.ws.subscribe(`/topic/games/${this.gameId}/bullets`, this.onBulletMessage)
+    this.ws.subscribe(`/topic/games/${this.gameId}/deaths`, this.onDeathMessage)
+    this.ws.subscribe(`/topic/games/${this.gameId}/joins`, this.onGameJoinMessage)
+    this.ws.subscribe(`/topic/games/${this.gameId}/iams`, this.onIAmMessage)
+    setTimeout(() => {
+      this.ws.unsubscribe(`/topic/games/${this.gameId}/iams`)
+    }, 10000)
   }
 
   onJoinGame(username: string, gameId: string): void {
@@ -258,7 +254,8 @@ export default class Game {
     this.state = 'PLAYING'
     this.startMenu.setVisibility(false)
     this.darkenMask.fadeDir = -1
-    this.player.joinGame()
+    this.player.joinGame(this.gameId)
     this.player.hasJoinedGame = true
+    this.subscribeToWSChannels()
   }
 }

@@ -15,5 +15,7 @@ public class IAmMessage {
 
     private UUID id;
     private String name;
+    private Position position;
+    private short rotation;
 
 }

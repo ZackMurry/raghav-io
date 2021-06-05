@@ -4,6 +4,7 @@ import com.zackmurry.onevoneio.model.PositionMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -16,10 +17,10 @@ public class PositionController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/position")
-    public void updatePosition(PositionMessage positionMessage) {
+    @MessageMapping("/games/{gameId}/position")
+    public void updatePosition(@DestinationVariable String gameId, PositionMessage positionMessage) {
 //        logger.info("Position of {}: ({}, {}); rotation: {}", positionMessage.getName(), positionMessage.getPosition().getX(), positionMessage.getPosition().getY(), positionMessage.getRotation());
-        simpMessagingTemplate.convertAndSend("/topic/positions", positionMessage);
+        simpMessagingTemplate.convertAndSend("/topic/games/" + gameId + "/positions", positionMessage);
     }
 
 }
