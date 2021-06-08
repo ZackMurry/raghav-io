@@ -2,11 +2,20 @@ import autoBind from 'auto-bind'
 import { Client, IMessage } from '@stomp/stompjs'
 import Body from './Body'
 import Player from './Player'
-import { BulletMessage, DeathMessage, GameJoinMessage, GameState, IAmMessage, PlayerPositionInformation } from './types'
+import {
+  BulletMessage,
+  DeathMessage,
+  GameEntity,
+  GameJoinMessage,
+  GameState,
+  IAmMessage,
+  MapSize,
+  PlayerPositionInformation
+} from './types'
 import Bullet from './Bullet'
 import FadingCanvasMask from './FadingCanvasMask'
 import DefaultMap from './map/DefaultMap'
-import StartMenu from './StartMenu'
+import StartMenu from './start/StartMenu'
 
 export default class Game {
   state: GameState
@@ -41,7 +50,8 @@ export default class Game {
     this.ws = new Client()
     this.map = new DefaultMap(this.canvas)
     this.startMenu = new StartMenu(this.canvas)
-    this.startMenu.onJoinGame = this.onJoinGame
+    this.startMenu.joinGameForm.onJoinGame = this.onJoinGame
+    this.startMenu.createGameForm.onCreateGame = (username, mapSize) => this.onCreateGame(username, mapSize)
     this.player = new Player(this.canvas, this.ws, this.map)
     console.debug('player id: ', this.player.id)
     this.ws.configure({
@@ -103,6 +113,7 @@ export default class Game {
 
   render(): void {
     // Clear previous frame
+    // todo show game id somewhere
     this.context.fillStyle = '#758f58'
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -245,7 +256,19 @@ export default class Game {
     }, 10000)
   }
 
-  onJoinGame(username: string, gameId: string): void {
+  async onJoinGame(username: string, gameId: string): Promise<void> {
+    const response = await fetch(`/api/v1/games/id/${gameId}`)
+    if (!response.ok) {
+      // todo error messages
+      if (response.status === 404) {
+        console.error('Game not found')
+      } else {
+        console.error(`Error joining game. Response status: ${response.status}`)
+      }
+      return
+    }
+    // todo: when map sizes are implemented, a map size variable will need to be set here based on the map size returned
+
     this.player.name = username
     this.player.x = 0
     this.player.y = 0
@@ -257,5 +280,23 @@ export default class Game {
     this.player.joinGame(this.gameId)
     this.player.hasJoinedGame = true
     this.subscribeToWSChannels()
+  }
+
+  async onCreateGame(username: string, mapSize: MapSize): Promise<void> {
+    console.log(username, mapSize)
+    const response = await fetch('/api/v1/games', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mapSize
+      })
+    })
+    if (!response.ok) {
+      console.error(`Error creating game. Response status: ${response.status}`)
+      return
+    }
+    const { id } = (await response.json()) as GameEntity
+    console.log(id)
+    this.onJoinGame(username, id)
   }
 }

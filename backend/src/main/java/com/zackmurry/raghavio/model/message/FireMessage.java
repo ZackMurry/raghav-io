@@ -1,5 +1,6 @@
-package com.zackmurry.raghavio.model;
+package com.zackmurry.raghavio.model.message;
 
+import com.zackmurry.raghavio.model.Position;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

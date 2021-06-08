@@ -1,19 +1,15 @@
-import autoBind from 'auto-bind'
-
-export default class StartMenu {
+export default class JoinGameForm {
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
   isVisible = true
-  menuElement: HTMLDivElement
-  onJoinGame: (name: string, gameId: string) => void = () => undefined
+  formElement: HTMLFormElement
+  onJoinGame: (username: string, gameId: string) => void = () => undefined
 
   constructor(canvas: HTMLCanvasElement) {
-    autoBind(this)
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
-    this.menuElement = document.getElementById('start-menu') as HTMLDivElement
-    const formElement = document.getElementById('details-form') as HTMLFormElement
-    formElement.onsubmit = this.onEnterGame
+    this.formElement = document.getElementById('join-game-form') as HTMLFormElement
+    this.formElement.onsubmit = e => this.onEnterGame(e)
   }
 
   setVisibility(visibility: boolean): void {
@@ -21,16 +17,16 @@ export default class StartMenu {
       return
     }
     if (visibility) {
-      this.menuElement.removeAttribute('style')
+      this.formElement.removeAttribute('style')
     } else {
-      this.menuElement.setAttribute('style', 'visibility: hidden')
+      this.formElement.setAttribute('style', 'display: none')
     }
     this.isVisible = visibility
   }
 
   onEnterGame(e: Event): void {
     e.preventDefault()
-    const formData = new FormData(document.getElementById('details-form') as HTMLFormElement)
+    const formData = new FormData(this.formElement)
     const username = formData.get('username') as string
     const gameId = formData.get('gameId') as string
     this.onJoinGame(username, gameId)

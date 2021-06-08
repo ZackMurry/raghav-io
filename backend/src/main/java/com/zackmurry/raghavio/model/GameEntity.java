@@ -5,16 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PositionMessage {
+public class GameEntity {
 
-    private UUID playerId;
-    private Position position;
-    private short rotation;
+    private String id;
+    private MapSize mapSize;
 
 }

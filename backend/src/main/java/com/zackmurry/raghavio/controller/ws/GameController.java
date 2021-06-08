@@ -1,7 +1,7 @@
-package com.zackmurry.raghavio.controller;
+package com.zackmurry.raghavio.controller.ws;
 
-import com.zackmurry.raghavio.model.GameJoinMessage;
-import com.zackmurry.raghavio.model.IAmMessage;
+import com.zackmurry.raghavio.model.message.GameJoinMessage;
+import com.zackmurry.raghavio.model.message.IAmMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

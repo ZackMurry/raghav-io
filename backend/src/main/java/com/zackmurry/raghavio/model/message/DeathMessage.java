@@ -1,4 +1,4 @@
-package com.zackmurry.raghavio.model;
+package com.zackmurry.raghavio.model.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,9 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameJoinMessage {
-    UUID id;
-    String name;
+public class DeathMessage {
+
+    private UUID playerId;
+    private UUID bulletId;
+
 }

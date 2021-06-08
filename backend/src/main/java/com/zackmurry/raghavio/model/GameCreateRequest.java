@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeathMessage {
+public class GameCreateRequest {
 
-    private UUID playerId;
-    private UUID bulletId;
+    private MapSize mapSize;
 
 }

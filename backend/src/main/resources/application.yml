@@ -1,6 +1,6 @@
 app:
   datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/onevoneio
+    jdbc-url: jdbc:postgresql://localhost:5432/raghavio
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     pool-size: 30

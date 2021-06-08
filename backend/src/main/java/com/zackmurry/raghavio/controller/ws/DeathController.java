@@ -1,6 +1,6 @@
-package com.zackmurry.raghavio.controller;
+package com.zackmurry.raghavio.controller.ws;
 
-import com.zackmurry.raghavio.model.DeathMessage;
+import com.zackmurry.raghavio.model.message.DeathMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

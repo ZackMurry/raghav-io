@@ -1,11 +1,12 @@
 body,
 html {
   --fonts: 'Hammersmith One', Roboto, Avenir, Helvetica, Arial, sans-serif;
+  --dark-text: #4a4a4a;
   font-family: var(--fonts);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #4a4a4a;
+  color: var(--dark-text);
   margin: 0;
   padding: 0;
   image-rendering: optimizeSpeed;
@@ -19,7 +20,7 @@ html {
 #menu-container {
   position: absolute;
   left: 50%;
-  top: 35%;
+  top: 40%;
   transform: translate(-50%, -50%);
 }
 
@@ -115,7 +116,8 @@ html {
   justify-content: center;
 }
 
-#details-form {
+#join-game-form,
+#create-game-form {
   background-color: white;
   box-shadow: 0 7px #c4c4c4;
   padding: 25px 18px;
@@ -134,7 +136,7 @@ html {
   border: none;
   outline: none;
   box-sizing: border-box;
-  color: #4a4a4a;
+  color: var(--dark-text);
   background-color: #e5e3e3;
   width: 100%;
   border-radius: 4px;
@@ -159,7 +161,7 @@ html {
   background-color: #52b260;
 }
 
-#details-form-submit-btn {
+#join-game-submit-btn {
   margin-top: 10px;
 }
 
@@ -175,4 +177,39 @@ html {
 #start-menu-footer > a {
   color: #e5e5e5;
   text-decoration: none;
+}
+
+#switch-screen-btn {
+  color: #e5e5e5;
+  font-weight: 600;
+  font-size: 1.1rem;
+  background: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 25px;
+}
+
+#create-game-map-size-select {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+}
+
+#create-game-map-size-select > label,
+option {
+  font-family: var(--fonts);
+}
+
+#create-game-map-size-select > label {
+  color: var(--dark-text);
+  font-size: 1.2rem;
+  padding-right: 25px;
+}
+
+#create-game-map-size-select > select {
+  padding: 5px;
+  font-size: 0.9rem;
 }

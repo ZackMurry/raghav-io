@@ -40,3 +40,11 @@ export interface IAmMessage {
   position: Position
   rotation: number
 }
+
+// todo: design multiple maps for this
+export type MapSize = 'SMALL' | 'MEDIUM' | 'LARGE'
+
+export interface GameEntity {
+  id: string
+  mapSize: MapSize
+}

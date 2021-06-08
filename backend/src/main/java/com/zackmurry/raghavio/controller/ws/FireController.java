@@ -1,7 +1,7 @@
-package com.zackmurry.raghavio.controller;
+package com.zackmurry.raghavio.controller.ws;
 
 
-import com.zackmurry.raghavio.model.FireMessage;
+import com.zackmurry.raghavio.model.message.FireMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
