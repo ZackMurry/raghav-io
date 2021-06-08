@@ -16,7 +16,9 @@ import Bullet from './Bullet'
 import FadingCanvasMask from './FadingCanvasMask'
 import DefaultMap from './map/DefaultMap'
 import StartMenu from './start/StartMenu'
+import showErrorMessage from './showErrorMessage'
 
+// todo fix "You died screen" (it doesn't show up rn)
 export default class Game {
   state: GameState
   canvas: HTMLCanvasElement
@@ -27,7 +29,7 @@ export default class Game {
   frameCount = 0
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
-  player: Player
+  player: Player | undefined
   ws: Client
   players: { [id: string]: Body } = {}
   bullets: Bullet[] = []
@@ -48,40 +50,18 @@ export default class Game {
       throw new Error('Canvas 2D context not found')
     }
     this.ws = new Client()
+    this.ws.configure({
+      brokerURL: 'ws://localhost/api/v1/websocket'
+    })
+    this.ws.activate()
+    window.addEventListener('resize', this.onResize)
     this.map = new DefaultMap(this.canvas)
     this.startMenu = new StartMenu(this.canvas)
     this.startMenu.joinGameForm.onJoinGame = this.onJoinGame
     this.startMenu.createGameForm.onCreateGame = (username, mapSize) => this.onCreateGame(username, mapSize)
-    this.player = new Player(this.canvas, this.ws, this.map)
-    console.debug('player id: ', this.player.id)
-    this.ws.configure({
-      brokerURL: 'ws://localhost/api/v1/websocket',
-      onConnect: () => {
-        this.player.onShoot = (angle, bulletId) => {
-          const bullet = new Bullet(
-            this.player.x,
-            this.player.y,
-            angle,
-            this.player.id,
-            this.canvas,
-            bulletId,
-            this.player,
-            this.map,
-            () => this.handleBulletCollision(bulletId)
-          )
-          bullet.onHitPlayer = () => this.onPlayerDeath(bulletId)
-          this.bullets.push(bullet)
-          setTimeout(() => {
-            this.bullets = this.bullets.filter(b => b.id !== bulletId)
-          }, 5000)
-        }
-        window.addEventListener('resize', this.onResize)
-        this.onResize()
-        this.main(0)
-      }
-    })
-    this.ws.activate()
     this.darkenMask = new FadingCanvasMask(0, 0, 0, 2500, 0.4, this.canvas)
+    this.onResize()
+    this.main(0)
   }
 
   main(time: number): void {
@@ -94,7 +74,7 @@ export default class Game {
     const delta = time - this.lastFrame
     this.lastFrame = time
     this.updateFps(delta)
-    if (this.state === 'PLAYING') {
+    if (this.state === 'PLAYING' && this.player) {
       this.player.update(delta)
     }
     this.bullets.forEach(b => b.update(delta))
@@ -117,20 +97,24 @@ export default class Game {
     this.context.fillStyle = '#758f58'
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
-    this.map.render(this.player.x, this.player.y)
+    if (this.player) {
+      this.map.render(this.player.x, this.player.y)
+    }
 
     // Display fps
     this.context.fillStyle = 'black'
     this.context.font = '18px Roboto'
-    this.context.fillText(
-      `Fps: ${this.fps}; x: ${Math.round(this.player.x)}; y: ${Math.round(this.player.y)}`,
-      this.canvas.width - 200,
-      50
-    )
+    if (this.player) {
+      this.context.fillText(
+        `Fps: ${this.fps}; x: ${Math.round(this.player.x)}; y: ${Math.round(this.player.y)}`,
+        this.canvas.width - 200,
+        50
+      )
+    }
     this.bullets.forEach(b => b.render())
     Object.values(this.players).forEach(b => b.render())
 
-    if (this.state === 'PLAYING') {
+    if (this.state === 'PLAYING' && this.player) {
       this.player.render()
     } else {
       this.context.fillStyle = 'rgba(0, 0, 0, 0.5)'
@@ -151,6 +135,10 @@ export default class Game {
   }
 
   onBulletMessage(message: IMessage): void {
+    if (!this.player) {
+      showErrorMessage('Player is undefined')
+      return
+    }
     const parsed = JSON.parse(message.body) as BulletMessage
     if (parsed.playerId === this.player.id) {
       return
@@ -174,6 +162,10 @@ export default class Game {
   }
 
   onDeathMessage(message: IMessage): void {
+    if (!this.player) {
+      showErrorMessage('Player is undefined')
+      return
+    }
     const { playerId, bulletId } = JSON.parse(message.body) as DeathMessage
     if (playerId === this.player.id) {
       return
@@ -183,6 +175,10 @@ export default class Game {
   }
 
   onPlayerDeath(bulletId: string): void {
+    if (!this.player) {
+      showErrorMessage('Player is undefined')
+      return
+    }
     this.state = 'DEAD'
     this.player.isAlive = false
     this.bullets = this.bullets.filter(b => b.id !== bulletId)
@@ -204,9 +200,14 @@ export default class Game {
   }
 
   onGameJoinMessage(message: IMessage): void {
+    if (!this.player) {
+      showErrorMessage('Player is undefined')
+      return
+    }
     const { id, name } = JSON.parse(message.body) as GameJoinMessage
     console.log(name, ' joined the game')
     if (id === this.player.id) {
+      console.log('player joined game')
       this.player.onJoinedGame()
       return
     }
@@ -215,6 +216,10 @@ export default class Game {
   }
 
   onIAmMessage(message: IMessage): void {
+    if (!this.player) {
+      showErrorMessage('Player is undefined')
+      return
+    }
     const { id, name, position, rotation } = JSON.parse(message.body) as IAmMessage
     if (id === this.player.id) {
       return
@@ -229,11 +234,24 @@ export default class Game {
   }
 
   subscribeToWSChannels(): void {
+    if (!this.player) {
+      showErrorMessage('Player is undefined')
+      return
+    }
+    if (!this.ws.connected) {
+      showErrorMessage('Websocket is not connected')
+      return
+    }
     this.ws.subscribe(`/topic/games/${this.gameId}/positions`, message => {
+      if (!this.player) {
+        showErrorMessage('Player is undefined')
+        return
+      }
       const parsed = JSON.parse(message.body) as PlayerPositionInformation
       if (parsed.playerId === this.player.id) {
         return
       }
+      console.log('setting position for ', parsed.playerId)
       if (this.players[parsed.playerId]) {
         this.players[parsed.playerId].setPosition(parsed.position.x, parsed.position.y, parsed.rotation)
       } else {
@@ -259,16 +277,38 @@ export default class Game {
   async onJoinGame(username: string, gameId: string): Promise<void> {
     const response = await fetch(`/api/v1/games/id/${gameId}`)
     if (!response.ok) {
-      // todo error messages
       if (response.status === 404) {
-        console.error('Game not found')
+        showErrorMessage('Game not found')
       } else {
-        console.error(`Error joining game. Response status: ${response.status}`)
+        showErrorMessage(`Error joining game. Response status: ${response.status}`)
       }
       return
     }
     // todo: when map sizes are implemented, a map size variable will need to be set here based on the map size returned
 
+    this.player = new Player(username, this.canvas, this.ws, this.map)
+    this.player.onShoot = (angle, bulletId) => {
+      if (!this.player) {
+        showErrorMessage('Player is undefined')
+        return
+      }
+      const bullet = new Bullet(
+        this.player.x,
+        this.player.y,
+        angle,
+        this.player.id,
+        this.canvas,
+        bulletId,
+        this.player,
+        this.map,
+        () => this.handleBulletCollision(bulletId)
+      )
+      bullet.onHitPlayer = () => this.onPlayerDeath(bulletId)
+      this.bullets.push(bullet)
+      setTimeout(() => {
+        this.bullets = this.bullets.filter(b => b.id !== bulletId)
+      }, 5000)
+    }
     this.player.name = username
     this.player.x = 0
     this.player.y = 0
@@ -277,9 +317,9 @@ export default class Game {
     this.state = 'PLAYING'
     this.startMenu.setVisibility(false)
     this.darkenMask.fadeDir = -1
-    this.player.joinGame(this.gameId)
-    this.player.hasJoinedGame = true
     this.subscribeToWSChannels()
+    this.player.joinGame(this.gameId)
+    this.player.isAlive = true
   }
 
   async onCreateGame(username: string, mapSize: MapSize): Promise<void> {

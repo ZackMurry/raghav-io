@@ -10,3 +10,4 @@ export const GUN_LENGTH = 60
 export const GUN_WIDTH = 14
 export const OUTLINE_COLOR = '#272736'
 export const TIME_BETWEEN_SHOTS_MS = 200
+export const ERROR_MESSAGE_DISPLAY_TIME_MS = 7000

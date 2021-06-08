@@ -213,3 +213,43 @@ option {
   padding: 5px;
   font-size: 0.9rem;
 }
+
+#error-msg-portal {
+  position: fixed;
+  bottom: 0%;
+  left: 5%;
+}
+
+.error-message {
+  background-color: #aa4444;
+  padding: 10px;
+  font-size: 1rem;
+  color: #e5e3e3;
+  border: 1px solid #913232;
+  border-radius: 5px;
+  max-width: 20vw;
+  animation: 7s error-animation linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes error-animation {
+  0% {
+    margin-bottom: -1.5vh;
+    opacity: 100%;
+  }
+
+  20% {
+    margin-bottom: 3vh;
+    opacity: 100%;
+  }
+
+  70% {
+    margin-bottom: 3vh;
+    opacity: 100%;
+  }
+
+  100% {
+    margin-bottom: -5vh;
+    opacity: 0%;
+  }
+}

@@ -26,18 +26,18 @@ export default class Player {
   name: string
   ws: Client
   onShoot: (angle: number, bulletId: string) => void
-  isAlive = true
+  isAlive = false
   map: DefaultMap
   id: string
   hasJoinedGame = false
   gameId: string | null = null
   lastShot = 0
 
-  constructor(canvas: HTMLCanvasElement, ws: Client, map: DefaultMap) {
+  constructor(name: string, canvas: HTMLCanvasElement, ws: Client, map: DefaultMap) {
     autoBind(this)
     this.ws = ws
+    this.name = name
     this.id = generateUUID()
-    this.name = `Zack ${Math.floor(Math.random() * 100)}`
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
     this.map = map
@@ -134,6 +134,7 @@ export default class Player {
 
   onMouseDown(e: MouseEvent): void {
     if (!this.isAlive || !this.hasJoinedGame) {
+      console.log(`${this.isAlive}; ${this.hasJoinedGame}`)
       return
     }
     if (new Date().getTime() - TIME_BETWEEN_SHOTS_MS < this.lastShot) {
@@ -171,7 +172,6 @@ export default class Player {
 
   sendShotToServer(angle: number, id: string): void {
     if (this.ws.connected && this.hasJoinedGame) {
-      console.log('Sending shot')
       this.ws.publish({
         destination: `/app/games/${this.gameId}/fire`,
         body: JSON.stringify({

@@ -20,7 +20,6 @@ public class FireController {
 
     @MessageMapping("/games/{gameId}/fire")
     public void updatePosition(@DestinationVariable String gameId, FireMessage fireMessage) {
-        logger.info("{} shot a bullet from ({}, {}) with a rotation of {} degrees", fireMessage.getPlayerId(), fireMessage.getOrigin().getX(), fireMessage.getOrigin().getY(), fireMessage.getAngle());
         simpMessagingTemplate.convertAndSend("/topic/games/" + gameId + "/bullets", fireMessage);
     }
 
