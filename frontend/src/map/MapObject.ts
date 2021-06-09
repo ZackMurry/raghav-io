@@ -1,3 +1,4 @@
+// todo circular objects
 export default abstract class MapObject {
   x: number
   y: number

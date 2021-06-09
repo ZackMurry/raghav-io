@@ -21,6 +21,7 @@ import GameMap from './map/GameMap'
 
 // todo fix "You died screen" (it doesn't show up rn)
 // todo only load players within a certain radius of the player to avoid cheating by zooming out
+// todo add teams (show teams by using player color)
 export default class Game {
   state: GameState
   canvas: HTMLCanvasElement
