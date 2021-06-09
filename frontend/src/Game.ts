@@ -14,11 +14,13 @@ import {
 } from './types'
 import Bullet from './Bullet'
 import FadingCanvasMask from './FadingCanvasMask'
-import DefaultMap from './map/DefaultMap'
+import SmallMap from './map/SmallMap'
 import StartMenu from './start/StartMenu'
 import showErrorMessage from './showErrorMessage'
+import GameMap from './map/GameMap'
 
 // todo fix "You died screen" (it doesn't show up rn)
+// todo only load players within a certain radius of the player to avoid cheating by zooming out
 export default class Game {
   state: GameState
   canvas: HTMLCanvasElement
@@ -34,7 +36,7 @@ export default class Game {
   players: { [id: string]: Body } = {}
   bullets: Bullet[] = []
   darkenMask: FadingCanvasMask
-  map: DefaultMap
+  map: GameMap
   startMenu: StartMenu
   gameId: string | null = null
 
@@ -55,7 +57,7 @@ export default class Game {
     })
     this.ws.activate()
     window.addEventListener('resize', this.onResize)
-    this.map = new DefaultMap(this.canvas)
+    this.map = new SmallMap(this.canvas)
     this.startMenu = new StartMenu(this.canvas)
     this.startMenu.joinGameForm.onJoinGame = this.onJoinGame
     this.startMenu.createGameForm.onCreateGame = (username, mapSize) => this.onCreateGame(username, mapSize)

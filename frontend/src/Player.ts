@@ -11,7 +11,7 @@ import {
   POSITION_UPDATE_TIME,
   TIME_BETWEEN_SHOTS_MS
 } from './constants'
-import DefaultMap from './map/DefaultMap'
+import GameMap from './map/GameMap'
 import { IAmMessage } from './types'
 
 export default class Player {
@@ -27,13 +27,13 @@ export default class Player {
   ws: Client
   onShoot: (angle: number, bulletId: string) => void
   isAlive = false
-  map: DefaultMap
+  map: GameMap
   id: string
   hasJoinedGame = false
   gameId: string | null = null
   lastShot = 0
 
-  constructor(name: string, canvas: HTMLCanvasElement, ws: Client, map: DefaultMap) {
+  constructor(name: string, canvas: HTMLCanvasElement, ws: Client, map: GameMap) {
     autoBind(this)
     this.ws = ws
     this.name = name

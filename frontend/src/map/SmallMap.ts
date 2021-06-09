@@ -1,25 +1,36 @@
 import autoBind from 'auto-bind'
 import { BULLET_RADIUS, PLAYER_COLLISION_LENIENCY, PLAYER_RADIUS } from '../constants'
 import CollisionUtils from './CollisionUtils'
+import GameMap from './GameMap'
+import MapBoundaries from './MapBoundaries'
 import MapObject from './MapObject'
 import Wall from './Wall'
 
-export default class DefaultMap {
+const SMALL_MAP_SIDE_LENGTH = 1500
+
+export default class SmallMap implements GameMap {
   objects: MapObject[] = []
   canvas: HTMLCanvasElement
+  boundaries: MapBoundaries
 
   constructor(canvas: HTMLCanvasElement) {
     autoBind(this)
     this.canvas = canvas
+    this.boundaries = new MapBoundaries(SMALL_MAP_SIDE_LENGTH, this.canvas)
     this.objects.push(new Wall(150, 150, 150, 'horizontal', this.canvas))
     this.objects.push(new Wall(150, 150, 150, 'vertical', this.canvas))
   }
 
   render(px: number, py: number): void {
+    this.boundaries.render(px, py)
     this.objects.forEach(o => o.render(px, py))
   }
 
   canPlayerMoveToPosition(px: number, py: number): boolean {
+    if (this.boundaries.isOutsideBounds(px, py)) {
+      return false
+    }
+
     // Treat player's hitbox as a square
     for (let i = 0; i < this.objects.length; i++) {
       const o = this.objects[i]

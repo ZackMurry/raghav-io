@@ -2,7 +2,7 @@
   "name": "raghav-io-frontend",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --open",
+    "dev": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview"
   },

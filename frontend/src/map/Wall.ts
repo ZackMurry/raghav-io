@@ -45,15 +45,5 @@ export default class Wall extends MapObject {
       this.width,
       this.height
     )
-    // this.context.save()
-    // this.context.translate(this.canvas.width / 2 + this.x - px, this.canvas.height / 2 - this.y + py)
-    // this.context.imageSmoothingEnabled = false
-    // if (this.dir === 'horizontal') {
-    //   this.context.rotate(-Math.PI / 2)
-    //   this.context.drawImage(this.element, -this.height, 0, this.height, this.width)
-    // } else {
-    //   this.context.drawImage(this.element, 0, 0, this.width, this.height)
-    // }
-    // this.context.restore()
   }
 }

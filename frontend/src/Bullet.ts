@@ -1,6 +1,6 @@
 import autoBind from 'auto-bind'
 import { BULLET_RADIUS, BULLET_SPEED, OUTLINE_COLOR, PLAYER_RADIUS } from './constants'
-import DefaultMap from './map/DefaultMap'
+import GameMap from './map/GameMap'
 import Player from './Player'
 
 export default class Bullet {
@@ -13,7 +13,7 @@ export default class Bullet {
   player: Player
   onHitPlayer: () => void
   shotBy: string
-  map: DefaultMap
+  map: GameMap
   onCollision: () => void
 
   constructor(
@@ -24,7 +24,7 @@ export default class Bullet {
     canvas: HTMLCanvasElement,
     id: string,
     player: Player,
-    map: DefaultMap,
+    map: GameMap,
     onCollision: () => void
   ) {
     autoBind(this)
