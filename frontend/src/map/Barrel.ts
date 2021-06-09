@@ -4,7 +4,7 @@ import MapObject from './MapObject'
 
 export const BARREL_RADIUS = 30
 
-const BARREL_COLOR = '#7d5d4f'
+const BARREL_COLOR = '#6b5045'
 const BARREL_HITBOX_RADIUS = Math.round((BARREL_RADIUS * 2) / 3)
 
 export default class Barrel extends MapObject {
@@ -58,14 +58,13 @@ export default class Barrel extends MapObject {
   drawLine(px: number, py: number, o: number): void {
     this.context.fillStyle = OUTLINE_COLOR
     const halfLineHeight = Math.sqrt(2 * BARREL_RADIUS * o - o * o)
-    this.context.fillRect(0, 0, 3, 3)
-    this.context.fillRect(
-      this.canvas.width / 2 + this.x - px + o - (BARREL_RADIUS - BARREL_HITBOX_RADIUS),
-      this.canvas.height / 2 - this.y + py - (BARREL_RADIUS - BARREL_HITBOX_RADIUS) + (BARREL_RADIUS - halfLineHeight),
-      3,
-      2 * halfLineHeight
+    this.context.save()
+    this.context.translate(
+      this.canvas.width / 2 + this.x - px + BARREL_HITBOX_RADIUS,
+      this.canvas.height / 2 - this.y + py + BARREL_HITBOX_RADIUS
     )
-    // this.context.fillRect(0, -halfLineHeight, 3, 2 * halfLineHeight)
-    // this.context.restore()
+    this.context.rotate(this.rotation)
+    this.context.fillRect(o - BARREL_RADIUS, -halfLineHeight, 3, 2 * halfLineHeight)
+    this.context.restore()
   }
 }
