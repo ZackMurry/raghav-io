@@ -1,14 +1,9 @@
 import autoBind from 'auto-bind'
 import { OUTLINE_COLOR, WALL_THICKNESS } from '../constants'
 import MapObject from './MapObject'
+import { WallDirection } from './Wall'
 
-export type WallDirection = 'vertical' | 'horizontal'
-
-const WOOD_WALL_COLOR = '#7d5d4f'
-
-// todo: create a WoodFloor object as well as other types of wall that would extend wall
-// (including a WoodWall that this would now become)
-export default class Wall extends MapObject {
+export default class Window extends MapObject {
   length: number
   dir: WallDirection
   canvas: HTMLCanvasElement
@@ -24,7 +19,7 @@ export default class Wall extends MapObject {
       h = length
       w = WALL_THICKNESS
     }
-    super(x, y, w, h, true, true)
+    super(x, y, w, h, true, false)
     autoBind(this)
     this.x = x
     this.y = y
@@ -35,7 +30,7 @@ export default class Wall extends MapObject {
   }
 
   render(px: number, py: number): void {
-    this.context.fillStyle = WOOD_WALL_COLOR
+    this.context.fillStyle = `rgba(176, 210, 212, 0.5)`
     this.context.fillRect(this.canvas.width / 2 + this.x - px, this.canvas.height / 2 - this.y + py, this.width, this.height)
     this.context.strokeStyle = OUTLINE_COLOR
     this.context.lineWidth = 3

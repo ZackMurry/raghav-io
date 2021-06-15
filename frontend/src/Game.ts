@@ -105,7 +105,7 @@ export default class Game {
     }
 
     // Display fps
-    this.context.fillStyle = 'black'
+    this.context.fillStyle = 'white'
     this.context.font = '18px Roboto'
     if (this.player) {
       this.context.fillText(
@@ -114,6 +114,12 @@ export default class Game {
         50
       )
     }
+
+    // Display game id
+    if (this.gameId) {
+      this.context.fillText(`Game id: ${this.gameId}`, 200, 50)
+    }
+
     this.bullets.forEach(b => b.render())
     Object.values(this.players).forEach(b => b.render())
 

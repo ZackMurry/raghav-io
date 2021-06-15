@@ -14,7 +14,14 @@ export default class Barrel extends MapObject {
 
   // x and y are the center coordinates
   constructor(x: number, y: number, canvas: HTMLCanvasElement) {
-    super(x - BARREL_HITBOX_RADIUS, y - BARREL_HITBOX_RADIUS, BARREL_HITBOX_RADIUS * 2 - 5, BARREL_HITBOX_RADIUS * 2, true)
+    super(
+      x - BARREL_HITBOX_RADIUS,
+      y - BARREL_HITBOX_RADIUS,
+      BARREL_HITBOX_RADIUS * 2 - 5,
+      BARREL_HITBOX_RADIUS * 2,
+      true,
+      true
+    )
     autoBind(this)
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D
