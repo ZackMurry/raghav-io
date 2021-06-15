@@ -54,7 +54,10 @@ export default class Game {
     }
     this.ws = new Client()
     this.ws.configure({
-      brokerURL: 'ws://localhost/api/v1/websocket'
+      brokerURL: 'ws://localhost/api/v1/websocket',
+      onConnect: () => {
+        showErrorMessage('Websocket connected')
+      }
     })
     this.ws.activate()
     window.addEventListener('resize', this.onResize)
@@ -176,6 +179,7 @@ export default class Game {
       return
     }
     const { playerId, bulletId } = JSON.parse(message.body) as DeathMessage
+    console.log(`${playerId} died`)
     if (playerId === this.player.id) {
       return
     }
@@ -193,9 +197,10 @@ export default class Game {
     this.bullets = this.bullets.filter(b => b.id !== bulletId)
     this.darkenMask.fadeIn()
     this.startMenu.setVisibility(true)
+    this.players = {}
     if (this.ws.connected) {
       this.ws.publish({
-        destination: '/app/death',
+        destination: `/app/games/${this.gameId}/death`,
         body: JSON.stringify({
           playerId: this.player.id,
           bulletId
@@ -258,6 +263,7 @@ export default class Game {
       }
       const parsed = JSON.parse(message.body) as PlayerPositionInformation
       if (parsed.playerId === this.player.id) {
+        this.player.onPositionMessage(parsed)
         return
       }
       console.log('setting position for ', parsed.playerId)

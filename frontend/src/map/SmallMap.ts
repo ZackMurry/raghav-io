@@ -36,6 +36,7 @@ export default class SmallMap implements GameMap {
     this.objects.push(new Wall(500, 550, 125, 'horizontal', this.canvas))
     this.objects.push(new Wall(300, 650, 100, 'vertical', this.canvas))
     this.objects.push(new Wall(-400, 100, 250, 'vertical', this.canvas))
+    this.objects.push(new Wall(-550, 400, 250, 'horizontal', this.canvas))
   }
 
   render(px: number, py: number): void {

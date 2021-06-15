@@ -5,6 +5,7 @@ import Player from './Player'
 /**
  * A player controlled by somebody on another device
  */
+// todo: conservation of momentum between updates
 export default class Body {
   name: string | null
   x: number | null

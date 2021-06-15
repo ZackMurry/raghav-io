@@ -12,7 +12,9 @@ import {
   TIME_BETWEEN_SHOTS_MS
 } from './constants'
 import GameMap from './map/GameMap'
-import { IAmMessage } from './types'
+import { IAmMessage, PlayerPositionInformation } from './types'
+
+const MAX_ATOMIC_PLAYER_MOVE_DISTANCE = 50
 
 export default class Player {
   x = 0
@@ -221,6 +223,14 @@ export default class Player {
           rotation: this.rotation
         } as IAmMessage)
       })
+    }
+  }
+
+  onPositionMessage(info: PlayerPositionInformation): void {
+    if (Math.abs(this.x - info.position.x) + Math.abs(this.y - info.position.y) > MAX_ATOMIC_PLAYER_MOVE_DISTANCE) {
+      console.log('player is lagging')
+      this.x = info.position.x
+      this.y = info.position.y
     }
   }
 }
